@@ -11,11 +11,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.volley.*;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Random;
 
 public class MainActivity extends ActionBarActivity implements LocationListener {
     private TextView latituteField;
     private TextView longitudeField;
+    private TextView venueField;
     private LocationManager locationManager;
     private String provider;
 
@@ -25,6 +34,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         latituteField = (TextView) findViewById(R.id.textView2);
         longitudeField = (TextView) findViewById(R.id.textView4);
+        venueField = (TextView) findViewById(R.id.textView6);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria,false);
@@ -36,6 +46,37 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
             latituteField.setText("Location not available");
             longitudeField.setText("Location not available");
         }
+
+        String url = "https://api.foursquare.com/v2/venues/search?ll="+
+                String.valueOf((double)location.getLatitude())+","+
+                String.valueOf((double)location.getLongitude())+
+                "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=1000&v=20150415&m=foursquare";
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // TODO Auto-generated method stub
+                        try {
+                            JSONObject venues = response.getJSONObject("response");
+                            JSONArray venue = venues.getJSONArray("venues");
+                            Random r = new Random();
+                            int rand = r.nextInt(venue.length());
+                            String randVenue = venues.getJSONObject(String.valueOf(rand)).getString("name");
+                            venueField.setText(randVenue);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
     }
 
     @Override
