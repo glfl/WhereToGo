@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.*;
 
 import org.json.JSONArray;
@@ -42,41 +43,43 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);
+
+            String url = "https://api.foursquare.com/v2/venues/search?ll="+
+                    String.valueOf((double)location.getLatitude())+","+
+                    String.valueOf((double)location.getLongitude())+
+                    "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=1000&v=20150415&m=foursquare";
+
+            RequestQueue queue = Volley.newRequestQueue(this);
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            // TODO Auto-generated method stub
+                            try {
+                                JSONObject responseObj = response.getJSONObject("response");
+                                JSONArray venues = responseObj.getJSONArray("venues");
+                                Random r = new Random();
+                                int rand = r.nextInt(venues.length());
+                                String randVenue = venues.getJSONObject(rand).getString("name");
+                                venueField.setText(randVenue);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+            queue.add(jsObjRequest);
         } else {
             latituteField.setText("Location not available");
             longitudeField.setText("Location not available");
         }
-
-        String url = "https://api.foursquare.com/v2/venues/search?ll="+
-                String.valueOf((double)location.getLatitude())+","+
-                String.valueOf((double)location.getLongitude())+
-                "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=1000&v=20150415&m=foursquare";
-
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // TODO Auto-generated method stub
-                        try {
-                            JSONObject venues = response.getJSONObject("response");
-                            JSONArray venue = venues.getJSONArray("venues");
-                            Random r = new Random();
-                            int rand = r.nextInt(venue.length());
-                            String randVenue = venues.getJSONObject(String.valueOf(rand)).getString("name");
-                            venueField.setText(randVenue);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-
-                    }
-                });
     }
 
     @Override
