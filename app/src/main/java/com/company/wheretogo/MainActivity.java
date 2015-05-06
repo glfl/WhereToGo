@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import java.util.Random;
 
 public class MainActivity extends ActionBarActivity implements LocationListener {
-    private TextView latituteField;
+    private TextView latitudeField;
     private TextView longitudeField;
     private TextView venueField;
     private LocationManager locationManager;
@@ -33,7 +33,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        latituteField = (TextView) findViewById(R.id.textView2);
+        latitudeField = (TextView) findViewById(R.id.textView2);
         longitudeField = (TextView) findViewById(R.id.textView4);
         venueField = (TextView) findViewById(R.id.textView6);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
                     });
             queue.add(jsObjRequest);
         } else {
-            latituteField.setText("Location not available");
+            latitudeField.setText("Location not available");
             longitudeField.setText("Location not available");
         }
     }
@@ -126,7 +126,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
     public void onLocationChanged(Location location) {
         int lat = (int) (location.getLatitude());
         int lng = (int) (location.getLongitude());
-        latituteField.setText(String.valueOf(lat));
+        latitudeField.setText(String.valueOf(lat));
         longitudeField.setText(String.valueOf(lng));
     }
 
