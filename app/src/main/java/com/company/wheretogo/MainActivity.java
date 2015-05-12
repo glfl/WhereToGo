@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
             String url = "https://api.foursquare.com/v2/venues/search?ll="+
                     String.valueOf((double)location.getLatitude())+","+
                     String.valueOf((double)location.getLongitude())+
-                    "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=1000&v=20150415&m=foursquare";
+                    "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=10000&v=20150415&m=foursquare";
 
             RequestQueue queue = Volley.newRequestQueue(this);
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
