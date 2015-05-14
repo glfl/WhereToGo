@@ -1,4 +1,5 @@
 package com.company.wheretogo;
+import android.app.Fragment;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
@@ -7,10 +8,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.*;
 import org.json.JSONArray;
@@ -22,65 +25,42 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends ActionBarActivity implements LocationListener {
     private TextView latitudeField;
     private TextView longitudeField;
+    private EditText radiusField;
     private TextView venueField;
     private LocationManager locationManager;
     private String provider;
+    private int radius;
+    private double myLatitude;
+    private double myLongitude;
+    private double venueLatitude;
+    private double venueLongitude;
+    private String venueName;
+    public final static String EXTRA_NAME = "com.company.wheretogo.NAME";
+    public final static String EXTRA_MYLAT = "com.company.wheretogo.MYLAT";
+    public final static String EXTRA_MYLNG = "com.company.wheretogo.MYLNG";
+    public final static String EXTRA_VLAT = "com.company.wheretogo.VLAT";
+    public final static String EXTRA_VLNG = "com.company.wheretogo.VLNG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        radius = 100;
+        radiusField = (EditText) findViewById(R.id.radius);
         latitudeField = (TextView) findViewById(R.id.textView2);
         longitudeField = (TextView) findViewById(R.id.textView4);
         venueField = (TextView) findViewById(R.id.textView6);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria,false);
-        Location location = locationManager.getLastKnownLocation(provider);
-        if (location != null) {
-            System.out.println("Provider " + provider + " has been selected.");
-            onLocationChanged(location);
-
-            String url = "https://api.foursquare.com/v2/venues/search?ll="+
-                    String.valueOf((double)location.getLatitude())+","+
-                    String.valueOf((double)location.getLongitude())+
-                    "&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=1000&v=20150513&m=foursquare";
-
-            RequestQueue queue = Volley.newRequestQueue(this);
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                    (Request.Method.GET, url, (String)null, new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            // TODO Auto-generated method stub
-                            try {
-                                JSONObject responseObj = response.getJSONObject("response");
-                                JSONArray venues = responseObj.getJSONArray("venues");
-                                Random r = new Random();
-                                int rand = r.nextInt(venues.length());
-                                String randVenue = venues.getJSONObject(rand).getString("name");
-                                venueField.setText(randVenue);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            // TODO Auto-generated method stub
-
-                        }
-                    });
-            queue.add(jsObjRequest);
-        } else {
-            latitudeField.setText("Location not available");
-            longitudeField.setText("Location not available");
-        }
+        // here
     }
 
     @Override
@@ -145,7 +125,45 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
     }
     
     public void onClick(View view){
-        Intent intent = new Intent(this, MapActivity.class);
-        startActivity(intent);
+        Location location = locationManager.getLastKnownLocation(provider);
+        if (location != null) {
+            System.out.println("Provider " + provider + " has been selected.");
+            onLocationChanged(location);
+            myLatitude = location.getLatitude();
+            myLongitude = location.getLongitude();
+            String url = String.format("https://api.foursquare.com/v2/venues/search?ll=%s,%s&client_id=120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK&client_secret=42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3&radius=%d&v=20150513&m=foursquare",
+                    String.valueOf(myLatitude),String.valueOf(myLongitude),radius);
+            RequestQueue queue = Volley.newRequestQueue(this);
+            RequestFuture<JSONObject> future = RequestFuture.newFuture();
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, (String)null, future, future);
+            queue.add(jsObjRequest);
+            try {
+                JSONObject response = future.get(30, TimeUnit.SECONDS);
+                JSONObject responseObj = response.getJSONObject("response");
+                JSONArray venues = responseObj.getJSONArray("venues");
+                Random r = new Random();
+                int rand = r.nextInt(venues.length());
+                JSONObject randVenue = venues.getJSONObject(rand);
+                venueName = randVenue.getString("name");
+                venueField.setText(venueName);
+                JSONObject venueLocation = randVenue.getJSONObject("location");
+                venueLatitude = Double.parseDouble(venueLocation.getString("lat"));
+                venueLongitude = Double.parseDouble(venueLocation.getString("lng"));
+                Intent intent = new Intent(this, MapActivity.class);
+                intent.putExtra(EXTRA_NAME,venueName);
+                intent.putExtra(EXTRA_MYLAT,myLatitude);
+                intent.putExtra(EXTRA_MYLNG,myLongitude);
+                intent.putExtra(EXTRA_VLAT,venueLatitude);
+                intent.putExtra(EXTRA_VLNG,venueLongitude);
+                startActivity(intent);
+            } catch (InterruptedException | TimeoutException |
+                    ExecutionException | JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            latitudeField.setText("Location not available");
+            longitudeField.setText("Location not available");
+        }
     }
 }
