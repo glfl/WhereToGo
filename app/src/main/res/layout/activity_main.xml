@@ -9,12 +9,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
-        <LinearLayout
-            android:id="@+id/linearLayout5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+
+
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
@@ -23,13 +19,7 @@
                 android:text="Куда пойти?"
                 android:textSize="40dip">
             </TextView>
-            </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
@@ -49,80 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text=" м">
             </TextView>
-            </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:text="Latitude:">
-            </TextView>
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="unknown">
-            </TextView>
-
-            </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:text="Longtitude:">
-            </TextView>
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="unknown">
-            </TextView>
-
-            </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:text="Place:">
-            </TextView>
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="unknown">
-            </TextView>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center">
             <Button
                 android:id="@+id/push_button"
                 android:layout_width="wrap_content"
@@ -131,6 +48,5 @@
                 android:textSize="40dip"
                 android:onClick="onClick"/>
 
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

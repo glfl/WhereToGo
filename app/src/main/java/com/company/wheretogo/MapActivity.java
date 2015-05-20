@@ -3,13 +3,12 @@ package com.company.wheretogo;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -45,6 +44,7 @@ public class MapActivity extends FragmentActivity
                 .tiltGesturesEnabled(false)
                 .camera(CameraPosition.builder().target(new LatLng(venueLat,venueLng)).zoom(14).build());
         MapFragment mMapFragment = MapFragment.newInstance(options);
+        //mMapFragment.setRetainInstance(true);
         FragmentTransaction fragmentTransaction =
                 getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mMapFragment);
