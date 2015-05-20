@@ -43,8 +43,7 @@ public class MapActivity extends FragmentActivity
                 .zoomGesturesEnabled(true)
                 .tiltGesturesEnabled(false)
                 .camera(CameraPosition.builder().target(new LatLng(venueLat,venueLng)).zoom(14).build());
-        MapFragment mMapFragment = MapFragment.newInstance(options);
-        //mMapFragment.setRetainInstance(true);
+        MyFragment mMapFragment = MyFragment.newInstance(options);
         FragmentTransaction fragmentTransaction =
                 getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.map, mMapFragment);
