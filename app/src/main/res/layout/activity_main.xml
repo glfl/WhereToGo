@@ -20,6 +20,11 @@
                 android:textSize="40dip">
             </TextView>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
@@ -39,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:text=" м">
             </TextView>
+        </LinearLayout>
 
             <Button
                 android:id="@+id/push_button"

@@ -1,8 +1,11 @@
 package com.company.wheretogo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -36,6 +39,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
     public final static String EXTRA_VLNG = "com.company.wheretogo.VLNG";
     String clientId = "120NFTDAPLRBGQPI4Z5HW43HELWZZEOJORPSJAQVBFQ0F3LK";
     String clientSecret = "42AMHHXLG1X2FGZFNXYYNBQUCALYGB3SG0BA2KG4HV1RSHM3";
+    ProgressDialog ringProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +91,6 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
         final Location location = locationManager.getLastKnownLocation(provider);
         onLocationChanged(location);
         if (location != null) {
-            //System.out.println("Provider " + provider + " has been selected.");
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -99,42 +102,82 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
                     String data = null;
                     try {
                         data = new SynchronousGet().run(url);
+                        JSONObject response = null;
+                        try {
+                            response = new JSONObject(data);
+                            JSONArray venues = response.getJSONObject("response")
+                                    .getJSONArray("groups")
+                                    .getJSONObject(0)
+                                    .getJSONArray("items");
+                            Random r = new Random();
+                            int rand = r.nextInt(venues.length());
+                            JSONObject randVenue = venues.getJSONObject(rand).getJSONObject("venue");
+                            venueName = randVenue.getString("name");
+                            JSONObject venueLocation = randVenue.getJSONObject("location");
+                            venueLatitude = Double.parseDouble(venueLocation.getString("lat"));
+                            venueLongitude = Double.parseDouble(venueLocation.getString("lng"));
+                            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                            intent.putExtra(EXTRA_NAME,venueName);
+                            intent.putExtra(EXTRA_MYLAT,myLatitude);
+                            intent.putExtra(EXTRA_MYLNG,myLongitude);
+                            intent.putExtra(EXTRA_VLAT,venueLatitude);
+                            intent.putExtra(EXTRA_VLNG,venueLongitude);
+                            startActivity(intent);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("Неизвестное местоположение")
+                                            .setMessage("Проверьте подключение к интернету")
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.cancel();
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                }
+                            });
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
-                    JSONObject response = null;
-                    try {
-                        response = new JSONObject(data);
-                        JSONArray venues = response.getJSONObject("response")
-                                .getJSONArray("groups")
-                                .getJSONObject(0)
-                                .getJSONArray("items");
-                        Random r = new Random();
-                        int rand = r.nextInt(venues.length());
-                        JSONObject randVenue = venues.getJSONObject(rand).getJSONObject("venue");
-                        venueName = randVenue.getString("name");
-                        JSONObject venueLocation = randVenue.getJSONObject("location");
-                        venueLatitude = Double.parseDouble(venueLocation.getString("lat"));
-                        venueLongitude = Double.parseDouble(venueLocation.getString("lng"));
-                        Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                        intent.putExtra(EXTRA_NAME,venueName);
-                        intent.putExtra(EXTRA_MYLAT,myLatitude);
-                        intent.putExtra(EXTRA_MYLNG,myLongitude);
-                        intent.putExtra(EXTRA_VLAT,venueLatitude);
-                        intent.putExtra(EXTRA_VLNG,venueLongitude);
-                        startActivity(intent);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                                        .setTitle("Неизвестное местоположение")
+                                        .setMessage("Проверьте подключение к интернету")
+                                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.cancel();
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+                            }
+                        });
                     }
                 }});
+            ringProgressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", null, true);
+            ringProgressDialog.setCancelable(false);
             t.start();
             try {
                 t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            ringProgressDialog.hide();
         } else {
-            // TODO
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Неизвестное местоположение")
+                    .setMessage("Проверьте подключение к интернету")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
     }
 }
